@@ -6,6 +6,7 @@ from scrapy.http import Request
 from scrapy.selector import Selector
 from PyDataMing.items import PydatamingItem
 import json
+from PyDataMing.ShowJson import showJson
 
 class Douban(CrawlSpider):
 
@@ -65,10 +66,5 @@ class Douban(CrawlSpider):
         dict['replys'] = replys
         dict['post'] = post
 
-        print dict
-
-
-
-
-
-
+        #print dict
+        showJson(dict)
