@@ -12,9 +12,9 @@ class Douban(CrawlSpider):
 
     name = "douban"
     redis_key = 'douban:start_urls'
-    start_urls = ['http://bbs.52waha.com/thread-296146-5-1.html']
+    start_urls = ['http://x.heshuicun.com/thread-426-2-1.html']
 
-    url = 'http://bbs.52waha.com/thread-296146-5-1.html'
+    url = 'http://bbs.360.cn/thread-14593261-1-1.html'
 
     def parse(self, response):
         # 源字典
@@ -51,8 +51,14 @@ class Douban(CrawlSpider):
             tit = selector.xpath('//*[@id="subject_tpc"]/text()').extract()
         if tit:
             titl = "".join(tit)
-
-
+        else:
+            tit = selector.xpath('//span[@class="s_title"]/span/text()').extract()
+        if tit:
+            titl = "".join(tit)
+        else:
+            tit = selector.xpath('//div[@class="title_box"]/h1/text()').extract()
+        if tit:
+            titl = "".join(tit)
 
         print '标题',titl
 
@@ -85,6 +91,21 @@ class Douban(CrawlSpider):
             # 合并列表
         if tim:
             time = "".join(tim[0])
+        else:
+            tim = selector.xpath('//*[@class="atl-info"]/span[2]/text()').extract()
+        if tim:
+            time = "".join(tim[0])
+        else:
+            tim = selector.xpath('//*[@class="time_box"]/span/text()').extract()
+            temp = selector.xpath('//*[@class="time_postcont"]/span/text()').extract()
+            tim.extend(temp)
+        if tim:
+            time = "".join(tim[0])
+
+
+        print '时间个数',len(tim)
+
+
 
 
 
@@ -115,8 +136,23 @@ class Douban(CrawlSpider):
         if data:
             cont = "".join(con[0])
         else:
-            data = selector.xpath('//*[@class= "t_f"]/font')
+            #针对 http://bbs.wisenjoy.com/thread-661254-1-1.html 无可奈何
+            data = selector.xpath('//*[starts-with(@id,"postmessage")]')
             con = data.xpath('string(.)').extract()
+        if data:
+            cont = "".join(con[0])
+        else:
+            # 天涯社区 的
+            data = selector.xpath('//*[normalize-space(@class)="atl-content"]/div[2]/div')
+            con = data.xpath('string(.)').extract()
+        if data:
+            cont = "".join(con[0])
+        else:
+            # 易车论坛 的 内容    有问题
+            con = selector.xpath('//*[@class="post_width"]/p[2]/span').xpath('string(.)').extract()
+            tempdata = selector.xpath('//*[@class="post_width"]/p').xpath('string(.)').extract()
+            con.extend(tempdata)
+            print '内容个数',len(con)
         if data:
             cont = "".join(con[0])
 
