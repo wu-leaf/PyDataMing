@@ -12,7 +12,7 @@ class Douban(CrawlSpider):
 
     name = "douban"
     redis_key = 'douban:start_urls'
-    start_urls = ['http://www.xici.net/d235376120.htm']
+    start_urls = ['http://club.baby.sina.com.cn/thread-3131207-1-1.html']
 
     url = 'http://bbs.360.cn/forum.php?mod=viewthread&tid=14235047&extra='
 
@@ -90,6 +90,41 @@ class Douban(CrawlSpider):
         if tit:
             titl = "".join(tit)
         else:
+            # 太平洋 论坛
+            tit = selector.xpath('//i[@id="subjectTitle"]/text()').extract()
+        if tit:
+            titl = "".join(tit)
+        else:
+            # 太平洋亲子网 论坛  PCbaby
+            tit = selector.xpath('//div[@class="post_r_tit"]/h1/text()').extract()
+        if tit:
+            titl = "".join(tit)
+        else:
+            # 大众点评
+            tit = selector.xpath('//div[@class="note-info no-img"]/p[@class="note-title"]/text()').extract()
+        if tit:
+            titl = "".join(tit)
+        else:
+            # 慧聪 商学院
+            tit = selector.xpath('//div[@class="share_left"]/div[@class="Amain"]/h1/text()').extract()
+        if tit:
+            titl = "".join(tit)
+        else:
+            #  羊城生活网
+            tit = selector.xpath('//div[@class="mainbox viewthread"]/h1/text()').extract()
+        if tit:
+            titl = "".join(tit)
+        else:
+            #  新浪 亲子论坛 网
+            tit = selector.xpath('//div[@class="mainbox viewthread "]/h1/text()').extract()
+        if tit:
+            titl = "".join(tit)
+        else:
+            #  爱卡汽车 论坛
+            tit = selector.xpath('//h1[@class="title"]/text()').extract()
+        if tit:
+            titl = "".join(tit)
+        else:
             # DOSPY 论坛       这个最好一直放在最后    很多论坛适用这个
             tit = selector.xpath('//title/text()').extract()
         if tit:
@@ -102,7 +137,11 @@ class Douban(CrawlSpider):
 
         # 时间数据筛选
         # 威锋网 适用  feng.com
-        tim = selector.xpath('//div[@class="authi"]/em[starts-with(@id,"authorposton")]/span/text()').extract()
+        tim = selector.xpath('//div[@class="authi"]/em[starts-with(@id,"authorposton")]').xpath('string(.)').extract()
+        # print 'tim',tim        叶子猪论坛
+        # t = selector.xpath('//div[@class="authi"]/em[starts-with(@id,"authorposton")]/span/text()').extract()
+        # print 't',t
+        # tim = tim + t
         if tim:
             time = "".join(tim[0])
         else:
@@ -173,6 +212,47 @@ class Douban(CrawlSpider):
         if tim:
             time = "".join(tim[0])
         else:
+            # 太平洋 论坛
+            tim = selector.xpath('//div[@class="post_time"]/text()').extract()
+        if tim:
+            time = "".join(tim[0])
+        else:
+            # 太平洋 亲子论坛 PCbaby
+            tim = selector.xpath('//div[@class="post_info"]/div[starts-with(@class,"user")]/text()').extract()
+        if tim:
+            time = "".join(tim[0])
+        else:
+            # 羊城生活网
+            tim = selector.xpath('//td[@class="postcontent"]/div[@class="postinfo"]/text()[5]').extract()
+        if tim:
+            time = "".join(tim[0])
+        else:
+            # 新浪 亲子论坛
+            tim = selector.xpath('//td[starts-with(@class,"postcontent")]/div[@class="postinfo"]/text()[5]').extract()
+        if tim:
+            time = "".join(tim[0])
+        else:
+            # 大众点评网
+            tim = selector.xpath('//*[@class="topic-info"]/span[@class="time"]/text()').extract()
+        if tim:
+            time = "".join(tim[0])
+        else:
+            # 慧聪商学院  论坛,评论者的时间没法爬取
+            tim = selector.xpath('//div[@class="header_tool clearFloat"]/p[@class="header_tool_l"]/span[@class="time"]/text()').extract()
+            #tim = selector.xpath('//div[@class="pl_1_right"]/div[@class="p1_name"]'
+                                # '/span[@class="p1_time"]/text()').extract()
+            #tim.insert(0, t[0])
+        if tim:
+            time = "".join(tim[0])
+        else:
+            # 大粤社区 网  论坛
+            t = selector.xpath('//div[@class="post_t gray"]/div[@class="authi z"]/span/em/text()').extract()
+            tim = selector.xpath('//div[@class="p_t cl"]/div[@class="z"]'
+                                 '/span[@class="gray mlm"]/em/text()').extract()
+            tim.insert(0, t[0])
+        if tim:
+            time = "".join(tim[0])
+        else:
             # 虎扑 论坛              只检索 楼主和  highlights 的
             t = selector.xpath('//div[@class="left"]/span[@class="stime"]/text()').extract()
             tim = selector.xpath('//div[@id="readfloor"]/div[@class="floor"]'
@@ -185,7 +265,6 @@ class Douban(CrawlSpider):
 
 
 
-
         # content数据筛选
         #.xpath('//div[@class="t_fsz"]/table/tbody/tr/td[@class="t_f"]/span[@id="travle_body"]')
         data = selector.xpath('//span[@id="travle_body"]')
@@ -195,8 +274,9 @@ class Douban(CrawlSpider):
             logging.warning('#####################################################################')
             print len(data)
             cont = "".join(con[0])
-        else:
+        else:     # 同时适用叶子猪论坛.两个切换：
             data = selector.xpath('//div[@class="t_fsz"]/table/tr/td[@class="t_f"]')
+            #data = selector.xpath('//div[@class="t_fsz"]/table/tbody/tr/td[@class="t_f"]')
             con = data.xpath('string(.)').extract()
         if data:
             cont = "".join(con[0])
@@ -236,7 +316,13 @@ class Douban(CrawlSpider):
         if con:
             cont = "".join(con[0])
         else:
-            # 太平洋
+            # 太平洋 汽车
+            con = selector.xpath('//td[@class="post_msg_wrap"]/div[@class="post_msg replyBody"]')\
+                .xpath('string(.)').extract()
+        if con:
+            cont = "".join(con[0])
+        else:
+            # 太平洋 手机
             con = selector.xpath('//*[@class="topiccontent"]').xpath('string(.)').extract()
             tempdata = selector.xpath('//*[@class="replycontent"]').xpath('string(.)').extract()
             con.extend(tempdata)
@@ -259,8 +345,15 @@ class Douban(CrawlSpider):
         if con:
             cont = "".join(con[0])
         else:
-            # DOSPY 论坛
+            # DOSPY 论坛   适用，新浪亲子网
             data = selector.xpath('//*[@class="t_msgfont"]')
+            con = data.xpath('string(.)').extract()
+
+        if con:
+            cont = "".join(con[0])
+        else:
+            # 太平洋 亲子网 论坛
+            data = selector.xpath('//div[@class="post_msg"]/div[1]')
             con = data.xpath('string(.)').extract()
         if con:
             cont = "".join(con[0])
@@ -278,6 +371,21 @@ class Douban(CrawlSpider):
             #  金融界 论坛
             data = selector.xpath('//*[@id="msgMainContent"]')
             con = data.xpath('string(.)').extract()
+        if con:
+            cont = "".join(con[0])
+        else:
+            #  慧聪 尚学院  论坛
+            data = selector.xpath('//*[@class="Amain_main"]')
+            con = data.xpath('string(.)').extract()
+        if con:
+            cont = "".join(con[0])
+        else:
+            # 大众点评网  傻逼东西,回复的内容大部分是一个图标
+            data = selector.xpath('//div[@class="topic-entry"]')
+            con = data.xpath('string(.)').extract()
+            a = [0, 0, 0, 0, 0, 0]
+            con = con+a
+            print con
         if con:
             cont = "".join(con[0])
 
