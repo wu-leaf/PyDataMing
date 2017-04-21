@@ -12,11 +12,15 @@ class Douban(CrawlSpider):
 
     name = "douban"
     redis_key = 'douban:start_urls'
-    start_urls = ['http://club.baby.sina.com.cn/thread-3131207-1-1.html']
+    global url
+    url = 'http://bbs.wisenjoy.com/thread-573812-1-1.html'
+    start_urls = [url]
 
-    url = 'http://bbs.360.cn/forum.php?mod=viewthread&tid=14235047&extra='
+
 
     def parse(self, response):
+
+
         # 源字典
         dict = {'post': '', 'replys': ''}
         # 定义 post 内部数据
@@ -358,7 +362,7 @@ class Douban(CrawlSpider):
         if con:
             cont = "".join(con[0])
         else:
-            # 虎扑 论坛      有点问题，跳过先     、https://bbs.hupu.com/17680096.html
+            # 虎扑 论坛      有点问题，跳过先     https://bbs.hupu.com/17680096.html
             con = selector.xpath('//div[@class="quote-content"]').xpath('string(.)').extract()
             #con = selector.xpath('//div[@id="readfloor"]/div[@class="floor"]'
                                #  '/div[@class="floor_box"]/table[@class="case"]/tbody/tr/td/text()').extract()
@@ -417,5 +421,5 @@ class Douban(CrawlSpider):
         dict['replys'] = replys
         dict['post'] = post
 
-        #print dict
-        showJson(dict)
+        #print url
+        showJson(url,dict)
