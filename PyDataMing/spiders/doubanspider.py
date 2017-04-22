@@ -7,26 +7,24 @@ from scrapy.selector import Selector
 from PyDataMing.items import PydatamingItem
 import json
 from PyDataMing.ShowJson import showJson
-
+from PyDataMing.getallurl import allUrl
 class Douban(CrawlSpider):
 
     name = "douban"
     redis_key = 'douban:start_urls'
     global url
-    url = 'http://bbs.wisenjoy.com/thread-573812-1-1.html'
-    start_urls = [url]
-
-
+    url = 'http://www.3sogou.com/read.php?tid=1089011'
+    start_urls = allUrl()
 
     def parse(self, response):
-
+        currenturl = response.url
 
         # 源字典
         dict = {'post': '', 'replys': ''}
         # 定义 post 内部数据
         post = {}
         # 定义 replys 内部数据,列表  形式    ，循环把字典放入这里
-        #replys = []
+        # replys = []
 
 
         selector = Selector(response)
@@ -272,10 +270,9 @@ class Douban(CrawlSpider):
         # content数据筛选
         #.xpath('//div[@class="t_fsz"]/table/tbody/tr/td[@class="t_f"]/span[@id="travle_body"]')
         data = selector.xpath('//span[@id="travle_body"]')
-        # 垃圾时空网，垃圾广西论坛，又卡又慢
+        # 时空网，广西论坛，又卡又慢
         con = data.xpath('string(.)').extract()
         if data:
-            logging.warning('#####################################################################')
             print len(data)
             cont = "".join(con[0])
         else:     # 同时适用叶子猪论坛.两个切换：
@@ -296,7 +293,7 @@ class Douban(CrawlSpider):
         if data:
             cont = "".join(con[0])
         else:
-            #这里居然劫持了新浪股吧的一个文字。   青青岛社区
+            #这里居然劫持了新浪股吧  的一个文字。   青青岛社区
             data = selector.xpath('//*[@class="layer_c"]/div[2]')
             con = data.xpath('string(.)').extract()
         if data:
@@ -313,7 +310,7 @@ class Douban(CrawlSpider):
         if data:
             cont = "".join(con[0])
         else:
-            # 易车论坛 的 内容    有问题   http://baa.bitauto.com/changancs75/thread-9819102.html
+            # 易车论坛 的内容,有问题   http://baa.bitauto.com/changancs75/thread-9819102.html
             con = selector.xpath('//*[@class="post_width"]/p[2]/span').xpath('string(.)').extract()
             tempdata = selector.xpath('//*[@class="post_width"]/p').xpath('string(.)').extract()
             con.extend(tempdata)
@@ -384,7 +381,7 @@ class Douban(CrawlSpider):
         if con:
             cont = "".join(con[0])
         else:
-            # 大众点评网  傻逼东西,回复的内容大部分是一个图标
+            # 大众点评网,回复的内容大部分是一个图标
             data = selector.xpath('//div[@class="topic-entry"]')
             con = data.xpath('string(.)').extract()
             a = [0, 0, 0, 0, 0, 0]
@@ -421,5 +418,4 @@ class Douban(CrawlSpider):
         dict['replys'] = replys
         dict['post'] = post
 
-        #print url
-        showJson(url,dict)
+        showJson(currenturl, dict)
